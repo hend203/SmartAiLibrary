@@ -1,5 +1,55 @@
 <?php
 
+// namespace App\Http\Controllers\Api;
+
+// use App\Http\Controllers\Controller;
+// use App\Models\Book;
+// use App\Http\Resources\Api\BookResource;
+// use Illuminate\Http\Request;
+
+// class HomeController extends Controller
+// {public function index(Request $request)
+// {
+//     // Daily Recommended - بسيط
+//     $dailyRecommended = Book::with('author')
+//         ->inRandomOrder()
+//         ->limit(6)
+//         ->get();
+
+//     // New Releases
+//     $newReleases = Book::with('author')
+//         ->latest()
+//         ->limit(10)
+//         ->get();
+
+//     // You Might Also Like - بسيط
+//     $youMightLike = Book::with('author')
+//         ->inRandomOrder()
+//         ->limit(10)
+//         ->get();
+
+//     // Recently Played - بسيط
+//     $recentlyPlayed = Book::with('author')
+//         ->inRandomOrder()
+//         ->limit(5)
+//         ->get();
+
+//     return response()->json([
+//         'status' => 'success',
+//         'data' => [
+//             'daily_recommended' => BookResource::collection($dailyRecommended),
+//             'recently_played'   => BookResource::collection($recentlyPlayed),
+//             'new_releases'      => BookResource::collection($newReleases),
+//             'you_might_like'    => BookResource::collection($youMightLike),
+//         ]
+//     ]);
+// }
+// }
+
+
+
+// <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;

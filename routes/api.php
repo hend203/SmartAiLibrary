@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\NewPasswordController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\BookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,9 +31,9 @@ Route::post('/forgot-password/reset', [NewPasswordController::class, 'resetPassw
 Route::get('/auth/{provider}/redirect', [AuthController::class, 'socialRedirect']);
 Route::get('/auth/{provider}/callback', [AuthController::class, 'socialCallback']);
 
-
+ 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/home', [HomeController::class, 'index']);
+   
     Route::get('/discover', [DiscoveryController::class, 'index']);
     Route::get('/search', [DiscoveryController::class, 'search']);
 
@@ -74,4 +75,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/books/{id}/share', [BookActionController::class, 'shareBook']);
 
     Route::get('/authors/{id}/profile', [AuthorProfileController::class, 'show']);
+
+    Route::get('/home', [HomeController::class, 'index']);
+    Route::delete('/books/{id}/history', [BookActionController::class, 'removeFromHistory']);
+ Route::get('/books', [BookController::class, 'index']);
 });

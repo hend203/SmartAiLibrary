@@ -53,6 +53,27 @@ class BookActionController extends Controller
         return response()->json(['message' => 'Playback started']);
     }
 
+    // 4. زر "Remove from History"
+    // لإزالة الكتاب من سجل الاستماع Recent History
+    public function removeFromHistory(Request $request, $id)
+{
+    $deleted = \App\Models\PersonalShelf::where('user_id', $request->user()->id)
+                ->where('book_id', $id)
+                ->delete();   // حذف كل entries للكتاب ده (عادة يكون entry واحد)
+
+    if ($deleted > 0) {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم حذف الكتاب من السجل بنجاح'
+        ]);
+    }
+
+    return response()->json([
+        'status' => 'error',
+        'message' => 'الكتاب غير موجود في السجل'
+    ], 404);
+}
+
     // 4. زر "Share"
     // توليد رابط فريد للكتاب (Deep Link)
     public function shareBook($id)

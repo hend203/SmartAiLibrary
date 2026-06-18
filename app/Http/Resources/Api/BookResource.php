@@ -25,6 +25,9 @@ class BookResource extends JsonResource
             'duration' => $this->duration, // لو كتاب صوتي
             'is_featured' => $this->is_featured,
             'published_at' => $this->published_date?->format('Y-m-d'),
+            'pdf' => $this->file_path
+    ? asset('storage/' . $this->file_path)
+    : null,
         ];
     }
 }
