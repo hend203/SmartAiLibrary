@@ -13,33 +13,34 @@ use Illuminate\Http\Request;
 class DiscoveryController extends Controller
 {
     public function index()
-    {
-        $categories = Category::where('is_active', true)->get();
+{
+    $categories = Category::where('is_active', true)->get();
 
-        $charts = [
-            ['id' => 'trending', 'title' => 'Top Trending 20', 'image' => asset('images/charts/trending.jpg')],
-            ['id' => 'new_release', 'title' => 'New Release 20', 'image' => asset('images/charts/new.jpg')],
-            ['id' => 'free', 'title' => 'Top Free 20', 'image' => asset('images/charts/free.jpg')],
-            ['id' => 'artist', 'title' => 'Top Artist 20', 'image' => asset('images/charts/artist.jpg')],
-        ];
+    // ✅ التعديل هنا: إضافة 'storage/' ليعمل الرابط الرمزي (Symlink) بشكل صحيح
+    $charts = [
+        ['id' => 'trending', 'title' => 'Top Trending 20', 'image' => asset('storage/images/charts/trending.jpg')],
+        ['id' => 'new_release', 'title' => 'New Release 20', 'image' => asset('storage/images/charts/new.jpg')],
+        ['id' => 'free', 'title' => 'Top Free 20', 'image' => asset('storage/images/charts/free.jpg')],
+        ['id' => 'artist', 'title' => 'Top Artist 20', 'image' => asset('storage/images/charts/artist.jpg')],
+    ];
 
-        $newReleases = Book::with('author')->latest()->limit(6)->get();
-        $topTrending = Book::with('author')->orderBy('view_count', 'desc')->limit(6)->get();
-        $editorsPick = Book::with('author')->where('is_editors_pick', true)->limit(6)->get();
-        $topFree = Book::with('author')->where('is_free', true)->limit(6)->get();
+    $newReleases = Book::with('author')->latest()->limit(6)->get();
+    $topTrending = Book::with('author')->orderBy('view_count', 'desc')->limit(6)->get();
+    $editorsPick = Book::with('author')->where('is_editors_pick', true)->limit(6)->get();
+    $topFree = Book::with('author')->where('is_free', true)->limit(6)->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'categories'   => CategoryResource::collection($categories),
-                'charts'       => $charts,
-                'new_releases' => BookResource::collection($newReleases),
-                'top_trending' => BookResource::collection($topTrending),
-                'editors_pick' => BookResource::collection($editorsPick),
-                'top_free'     => BookResource::collection($topFree),
-            ]
-        ]);
-    }
+    return response()->json([
+        'status' => 'success',
+        'data' => [
+            'categories'   => CategoryResource::collection($categories),
+            'charts'       => $charts,
+            'new_releases' => BookResource::collection($newReleases),
+            'top_trending' => BookResource::collection($topTrending),
+            'editors_pick' => BookResource::collection($editorsPick),
+            'top_free'     => BookResource::collection($topFree),
+        ]
+    ]);
+}
 
     public function search(Request $request)
     {
@@ -87,4 +88,19 @@ class DiscoveryController extends Controller
             ]
         ]);
     }
+    public function booksByCategory(Request $request, $categoryId)
+{
+    $books = Book::with('author')
+        ->where('category_id', $categoryId)
+        ->paginate(20);
+
+    $category = Category::find($categoryId);
+
+    return BookResource::collection($books)->additional([
+        'meta' => [
+            'title' => $category->name ?? 'Category',
+            'subtitle' => 'mix by Nubook'
+        ]
+    ]);
+}
 }

@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // قوائم الـ 20 المخصصة
     Route::get('/discover/trending-20', [DiscoveryController::class, 'topTrendingList']);
     Route::get('/discover/free-20', [DiscoveryController::class, 'topFreeList']);
+    Route::get('/discover/category/{categoryId}', [DiscoveryController::class, 'booksByCategory']);
 
     // روابط المؤلفين والفنانين
     Route::get('/authors', [AuthorController::class, 'index']);
