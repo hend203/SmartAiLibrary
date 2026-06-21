@@ -20,6 +20,7 @@ class BookResource extends JsonResource
             'description' => $this->description,
             'cover_image' => $this->cover_image,
             'author_name' => $this->author?->name,
+            'author_id' => $this->author_id,
             'category_name' => $this->category?->name,
             'average_rating' => (float) $this->average_rating,
             'duration' => $this->duration, // لو كتاب صوتي
