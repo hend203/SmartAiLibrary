@@ -3,31 +3,35 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Book;
-use App\Models\Author;
-use App\Models\SearchHistory;
 use App\Http\Resources\Api\BookResource;
+use App\Http\Resources\Api\CourseResource;
+use App\Http\Resources\Api\InstructorResource;
+use App\Models\Author;
+use App\Models\Book;
+use App\Models\Course;
+use App\Models\Instructor;
+use App\Models\SearchHistory;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-    // 1. واجهة البحث الأولية (Suggestions & History)
+    // البحث الأولي
     public function getInitialData(Request $request)
     {
         $user = $request->user();
 
-        // Recent Searches
         $recent = SearchHistory::where('user_id', $user->id)
             ->latest()
             ->distinct('query')
             ->limit(5)
             ->get(['id', 'query']);
 
-        // Popular Searches (ممكن تخليها ثابتة أو ديناميكية حسب أكتر كلمات بحثاً)
         $popular = [
             ['id' => 1, 'name' => 'Fiksi & Sastra'],
             ['id' => 2, 'name' => 'Cerita Anak'],
             ['id' => 3, 'name' => 'Technology'],
+            ['id' => 4, 'name' => 'Programming'],
+            ['id' => 5, 'name' => 'Design'],
         ];
 
         return response()->json([
@@ -36,37 +40,45 @@ class SearchController extends Controller
         ]);
     }
 
-    // 2. البحث العام (يظهر نتائج مختلطة)
+    // البحث العام — بيشمل كتب + مؤلفين + كورسات + instructors دفعة واحدة
     public function globalSearch(Request $request)
     {
         $query = $request->get('q');
         if (!$query) return response()->json(['data' => []]);
 
-        // حفظ كلمة البحث في السجل
-        SearchHistory::updateOrCreate([
-            'user_id' => $request->user()->id,
-            'query' => $query
-        ], ['created_at' => now()]);
+        SearchHistory::updateOrCreate(
+            ['user_id' => $request->user()->id, 'query' => $query],
+            ['created_at' => now()]
+        );
 
-        // البحث في الكتب
         $books = Book::with('author')
             ->where('title', 'LIKE', "%{$query}%")
             ->limit(3)->get();
 
-        // البحث في المؤلفين والرواة
         $people = Author::where('name', 'LIKE', "%{$query}%")
+            ->limit(3)->get();
+
+        // ← جديد
+        $courses = Course::with('instructor')
+            ->where('title', 'LIKE', "%{$query}%")
+            ->limit(3)->get();
+
+        // ← جديد
+        $instructors = Instructor::where('name', 'LIKE', "%{$query}%")
             ->limit(3)->get();
 
         return response()->json([
             'query' => $query,
             'results' => [
                 'books' => BookResource::collection($books),
-                'authors_and_narrators' => $people // ممكن تعمل له Resource مخصص
+                'authors_and_narrators' => $people,
+                'courses' => CourseResource::collection($courses),         // ← جديد
+                'instructors' => InstructorResource::collection($instructors), // ← جديد
             ]
         ]);
     }
 
-    // 3. البحث المخصص (مثلاً البحث في الكتب فقط كما في الصورة)
+    // البحث المتخصص — بيشمل books + narrators + courses + instructors
     public function searchByType(Request $request, $type)
     {
         $query = $request->get('q');
@@ -82,10 +94,23 @@ class SearchController extends Controller
             return response()->json(['data' => $results]);
         }
 
+        // ← جديد
+        if ($type === 'courses') {
+            $results = Course::with('instructor')
+                ->where('title', 'LIKE', "%{$query}%")->get();
+            return CourseResource::collection($results);
+        }
+
+        // ← جديد
+        if ($type === 'instructors') {
+            $results = Instructor::where('name', 'LIKE', "%{$query}%")->get();
+            return InstructorResource::collection($results);
+        }
+
         return response()->json(['message' => 'Invalid type'], 400);
     }
 
-    // 4. حذف سجل بحث واحد أو الكل
+    // حذف سجل البحث
     public function clearHistory(Request $request, $id = null)
     {
         if ($id) {

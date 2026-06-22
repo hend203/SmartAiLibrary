@@ -13,12 +13,12 @@ use App\Http\Controllers\Api\NewPasswordController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\BookController;
+use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\CourseHomeController;
+use App\Http\Controllers\Api\CourseDiscoveryController;
+use App\Http\Controllers\Api\InstructorProfileController;
+use App\Http\Controllers\Api\InstructorController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes - Smart AI Library
-|--------------------------------------------------------------------------
-*/
 
 // Authentication Routes (Public)
 Route::post('/register', [AuthController::class, 'register']); // إنشاء حساب
@@ -68,6 +68,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // عمليات الـ Toggle (عند الضغط على القلب أو متابعة)
     Route::post('/favorites/book/{id}', [FavoriteController::class, 'toggleBookFavorite']);
     Route::post('/favorites/author/{id}', [FavoriteController::class, 'toggleAuthorFavorite']);
+    Route::post('/favorites/course/{id}', [FavoriteController::class, 'toggleCourseFavorite']);
+    Route::post('/favorites/instructor/{id}', [FavoriteController::class, 'toggleInstructorFavorite']);
+    
 
     // روابط قائمة الخيارات (Modal Actions)
     Route::post('/books/{id}/favorite', [BookActionController::class, 'toggleFavorite']);
@@ -79,5 +82,114 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/home', [HomeController::class, 'index']);
     Route::delete('/books/{id}/history', [BookActionController::class, 'removeFromHistory']);
+    Route::get('/books', [BookController::class, 'index']);
+    // ───── Courses ─────
+    Route::get('/courses/home', [CourseHomeController::class, 'index']);
+    Route::get('/courses/discover', [CourseDiscoveryController::class, 'index']);
+    Route::get('/courses/search', [CourseDiscoveryController::class, 'search']);
+    Route::get('/courses/trending-20', [CourseDiscoveryController::class, 'topTrendingList']);
+    Route::get('/courses/free-20', [CourseDiscoveryController::class, 'topFreeList']);
+    Route::get('/courses/category/{categoryId}', [CourseDiscoveryController::class, 'coursesByCategory']);
+    Route::get('/courses/continue-watching', [CourseController::class, 'continueWatching']);
+    
+    Route::get('/courses', [CourseController::class, 'index']);
+    Route::get('/courses/{id}', [CourseController::class, 'show']);
+    Route::post('/courses/{id}/progress', [CourseController::class, 'updateProgress']);
+
+    // ───── Instructors ─────
+    Route::get('/instructors/{id}/profile', [InstructorProfileController::class, 'show']);
+    Route::get('/instructors', [InstructorController::class, 'index']);
+    Route::get('/instructors/{id}/similar', [InstructorController::class, 'similar']);
+
+    
+    // Chatbot
+    Route::post('/chatbot/message', function (Request $request) {
+        $message = $request->input('message');
+        $history = $request->input('history', []);
+        $conversationId = $request->input('conversation_id');
+
+        // إنشاء أو تحديث الـ conversation
+        if ($conversationId) {
+            $conversation = \App\Models\ChatConversation::where('user_id', $request->user()->id)
+                ->findOrFail($conversationId);
+        } else {
+            $conversation = \App\Models\ChatConversation::create([
+                'user_id' => $request->user()->id,
+                'title'   => mb_substr($message, 0, 50),
+            ]);
+        }
+
+        // حفظ رسالة المستخدم
+        $conversation->messages()->create([
+            'role'    => 'user',
+            'content' => $message,
+        ]);
+
+        $messages = [
+            ['role' => 'system', 'content' => 'You are Learnova AI assistant. You help users with audiobooks and e-learning. Be helpful and friendly. Answer in the same language the user writes in.'],
+        ];
+        foreach ($history as $msg) {
+            $messages[] = ['role' => $msg['role'], 'content' => $msg['content']];
+        }
+        $messages[] = ['role' => 'user', 'content' => $message];
+
+        $response = \Illuminate\Support\Facades\Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('OPENROUTER_API_KEY'),
+            'Content-Type'  => 'application/json',
+            'HTTP-Referer'  => 'https://learnova.app',
+        ])->post('https://openrouter.ai/api/v1/chat/completions', [
+            'model'    => 'openai/gpt-oss-20b:free',
+            'messages' => $messages,
+        ]);
+
+        if ($response->failed()) {
+            return response()->json(['error' => 'AI service unavailable', 'details' => $response->json()], 503);
+        }
+
+        $botReply = $response->json('choices.0.message.content') ?? 'عذراً، حدث خطأ.';
+
+        // حفظ رد البوت
+        $conversation->messages()->create([
+            'role'    => 'assistant',
+            'content' => $botReply,
+        ]);
+
+        return response()->json([
+            'id'              => uniqid(),
+            'message'         => $botReply,
+            'role'            => 'assistant',
+            'conversation_id' => $conversation->id,
+        ]);
+    });
+
+    // Chat History
+    Route::get('/chat/conversations', function (Request $request) {
+        $conversations = \App\Models\ChatConversation::where('user_id', $request->user()->id)
+            ->withCount('messages')
+            ->latest()
+            ->get();
+        return response()->json($conversations);
+    });
+
+    Route::get('/chat/conversations/{id}', function (Request $request, $id) {
+        $conversation = \App\Models\ChatConversation::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->with('messages')
+            ->firstOrFail();
+        return response()->json($conversation);
+    });
+
+    Route::delete('/chat/conversations/{id}', function (Request $request, $id) {
+        \App\Models\ChatConversation::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->delete();
+        return response()->json(['message' => 'Deleted successfully']);
+    });
+
+    Route::get('/authors/{id}/profile', [AuthorProfileController::class, 'show']);
+
+    Route::get('/home', [HomeController::class, 'index']);
+    Route::delete('/books/{id}/history', [BookActionController::class, 'removeFromHistory']);
  Route::get('/books', [BookController::class, 'index']);
+
 });
