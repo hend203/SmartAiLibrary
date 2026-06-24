@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3dcdbd2782f774da4c2160f89ca44bf7",
+    "content-hash": "28e6e7dcfc030e55b3873c8e6e3f26dd",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -613,16 +613,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "4.4.3",
+            "version": "4.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec"
+                "reference": "3d544473fb93f5c25b483ea4f4ce99f8c4d9d44c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/61e730f1658814821a85f2402c945f3883407dec",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/3d544473fb93f5c25b483ea4f4ce99f8c4d9d44c",
+                "reference": "3d544473fb93f5c25b483ea4f4ce99f8c4d9d44c",
                 "shasum": ""
             },
             "require": {
@@ -638,9 +638,9 @@
                 "phpstan/phpstan": "2.1.30",
                 "phpstan/phpstan-phpunit": "2.0.7",
                 "phpstan/phpstan-strict-rules": "^2",
-                "phpunit/phpunit": "11.5.50",
-                "slevomat/coding-standard": "8.27.1",
-                "squizlabs/php_codesniffer": "4.0.1",
+                "phpunit/phpunit": "11.5.23",
+                "slevomat/coding-standard": "8.24.0",
+                "squizlabs/php_codesniffer": "4.0.0",
                 "symfony/cache": "^6.3.8|^7.0|^8.0",
                 "symfony/console": "^5.4|^6.3|^7.0|^8.0"
             },
@@ -699,7 +699,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/4.4.3"
+                "source": "https://github.com/doctrine/dbal/tree/4.4.1"
             },
             "funding": [
                 {
@@ -715,7 +715,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-20T08:52:12+00:00"
+            "time": "2025-12-04T10:11:03+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -2448,16 +2448,16 @@
         },
         {
             "name": "laravel/sanctum",
-            "version": "v4.3.2",
+            "version": "v4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sanctum.git",
-                "reference": "2a9bccc18e9907808e0018dd15fa643937886b1e"
+                "reference": "e3b85d6e36ad00e5db2d1dcc27c81ffdf15cbf76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sanctum/zipball/2a9bccc18e9907808e0018dd15fa643937886b1e",
-                "reference": "2a9bccc18e9907808e0018dd15fa643937886b1e",
+                "url": "https://api.github.com/repos/laravel/sanctum/zipball/e3b85d6e36ad00e5db2d1dcc27c81ffdf15cbf76",
+                "reference": "e3b85d6e36ad00e5db2d1dcc27c81ffdf15cbf76",
                 "shasum": ""
             },
             "require": {
@@ -2507,7 +2507,7 @@
                 "issues": "https://github.com/laravel/sanctum/issues",
                 "source": "https://github.com/laravel/sanctum"
             },
-            "time": "2026-04-30T11:46:25+00:00"
+            "time": "2026-02-07T17:19:31+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -2572,32 +2572,32 @@
         },
         {
             "name": "laravel/socialite",
-            "version": "v5.27.0",
+            "version": "v5.24.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/socialite.git",
-                "reference": "40e0757a75637c7b2dff05d3286b0d8fc25e5c0e"
+                "reference": "5cea2eebf11ca4bc6c2f20495c82a70a9b3d1613"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/socialite/zipball/40e0757a75637c7b2dff05d3286b0d8fc25e5c0e",
-                "reference": "40e0757a75637c7b2dff05d3286b0d8fc25e5c0e",
+                "url": "https://api.github.com/repos/laravel/socialite/zipball/5cea2eebf11ca4bc6c2f20495c82a70a9b3d1613",
+                "reference": "5cea2eebf11ca4bc6c2f20495c82a70a9b3d1613",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "firebase/php-jwt": "^6.4|^7.0",
                 "guzzlehttp/guzzle": "^6.0|^7.0",
-                "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
-                "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "league/oauth1-client": "^1.11",
                 "php": "^7.2|^8.0",
                 "phpseclib/phpseclib": "^3.0"
             },
             "require-dev": {
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^4.18|^5.20|^6.47|^7.55|^8.36|^9.15|^10.8|^11.0",
+                "orchestra/testbench": "^4.18|^5.20|^6.47|^7.55|^8.36|^9.15|^10.8",
                 "phpstan/phpstan": "^1.12.23",
                 "phpunit/phpunit": "^8.0|^9.3|^10.4|^11.5|^12.0"
             },
@@ -2640,7 +2640,7 @@
                 "issues": "https://github.com/laravel/socialite/issues",
                 "source": "https://github.com/laravel/socialite"
             },
-            "time": "2026-04-24T14:05:47+00:00"
+            "time": "2026-01-10T16:07:28+00:00"
         },
         {
             "name": "laravel/tinker",

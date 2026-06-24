@@ -1,0 +1,11 @@
+start	end	text
+0	5040	Well, that's it. Those are all the fundamentals you need to know, the basics to get started with
+5040	11440	some ex-unit stuff and some integration testing stuff. We're gonna go deeper, but before we do,
+11440	15440	the next section I want to remind you is an optional section for those who want to get
+15440	21440	more familiar with different types of accessions and testing different values. It was actually a
+21440	26160	section from the unit testing course which is provided here for free for everyone. It is not
+26160	31120	part of the price you paid to buy this course. It will introduce you to fluent accessions,
+31120	35360	it will show you how you can assert different things and you can apply that knowledge for
+35360	40240	integration tests. If you're already familiar with that, you can just skip it. It is technically
+40240	44640	optional. Like I said in the beginning of the section, you can find the code for the section
+44640	46800	you just watched below this video.

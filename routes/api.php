@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthorController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Api\CourseHomeController;
 use App\Http\Controllers\Api\CourseDiscoveryController;
 use App\Http\Controllers\Api\InstructorProfileController;
 use App\Http\Controllers\Api\InstructorController;
+
 
 
 // Authentication Routes (Public)
@@ -95,19 +97,62 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/{id}', [CourseController::class, 'show']);
     Route::post('/courses/{id}/progress', [CourseController::class, 'updateProgress']);
-
+    
     // ───── Instructors ─────
     Route::get('/instructors/{id}/profile', [InstructorProfileController::class, 'show']);
     Route::get('/instructors', [InstructorController::class, 'index']);
     Route::get('/instructors/{id}/similar', [InstructorController::class, 'similar']);
-
+    Route::post('/lessons/{id}/transcribe', function (Request $request, $id) {
+        set_time_limit(300);
+    $lesson = \App\Models\CourseLesson::findOrFail($id);
+    
+    // لو الـ transcript موجود أصلاً، رجّعه على طول
+    if ($lesson->transcript) {
+        return response()->json(['transcript' => $lesson->transcript]);
+    }
+    
+    // لو مش موجود، اعمله دلوقتي
+    $videoPath = storage_path('app/public/' . $lesson->video_path);
+    $outputDir = storage_path('app/transcripts');
+    
+    if (!is_dir($outputDir)) mkdir($outputDir, 0755, true);
+    
+    $pythonPath = 'C:\\Users\\Hind\\AppData\\Local\\Programs\\Python\\Python311\\python.exe';
+    $command = "\"{$pythonPath}\" -m whisper \"{$videoPath}\" --model small --output_format txt --output_dir \"{$outputDir}\" 2>&1";
+    
+    exec($command, $output, $exitCode);
+    
+    $filename = pathinfo($videoPath, PATHINFO_FILENAME);
+    $transcriptPath = $outputDir . '\\' . $filename . '.txt';
+    
+    if (file_exists($transcriptPath)) {
+        $transcript = file_get_contents($transcriptPath);
+        $lesson->update(['transcript' => $transcript]);
+        return response()->json(['transcript' => $transcript]);
+    }
+    
+    return response()->json(['transcript' => null]);
+});
     
     // Chatbot
     Route::post('/chatbot/message', function (Request $request) {
         $message = $request->input('message');
         $history = $request->input('history', []);
         $conversationId = $request->input('conversation_id');
-
+        $lessonId       = $request->input('lesson_id');
+        Log::info('lesson_id: ' . $lessonId);
+          // جيب الـ transcript لو في lesson_id
+    $context = null;
+    if ($lessonId) {
+        $lesson  = \App\Models\CourseLesson::find($lessonId);
+        $context = $lesson?->transcript;
+    }
+     Log::info('transcript: ' . ($context ?? 'NULL'));
+        $systemPrompt = 'You are Learnova AI assistant. Be helpful and friendly. Answer in the same language the user writes in.';
+    if ($context) {
+        $systemPrompt .= "\n\nمحتوى الدرس الحالي:\n" . $context;
+        $systemPrompt .= "\n\nرد على أساس محتوى الدرس ده بس.";
+    }
         // إنشاء أو تحديث الـ conversation
         if ($conversationId) {
             $conversation = \App\Models\ChatConversation::where('user_id', $request->user()->id)
@@ -126,8 +171,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
 
         $messages = [
-            ['role' => 'system', 'content' => 'You are Learnova AI assistant. You help users with audiobooks and e-learning. Be helpful and friendly. Answer in the same language the user writes in.'],
-        ];
+    ['role' => 'system', 'content' => $systemPrompt], // الجديد اللي فيه الـ transcript
+];
         foreach ($history as $msg) {
             $messages[] = ['role' => $msg['role'], 'content' => $msg['content']];
         }
@@ -138,7 +183,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'Content-Type'  => 'application/json',
             'HTTP-Referer'  => 'https://learnova.app',
         ])->post('https://openrouter.ai/api/v1/chat/completions', [
-            'model'    => 'openai/gpt-oss-20b:free',
+            'model' => 'openai/gpt-oss-20b:free',
             'messages' => $messages,
         ]);
 
