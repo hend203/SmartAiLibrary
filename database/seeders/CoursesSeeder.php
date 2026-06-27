@@ -31,7 +31,7 @@ class CoursesSeeder extends Seeder
 
         // 3. إنشاء الكورسات
         Course::factory()
-            ->count(120)
+            ->count(50)
             ->create()
             ->each(function ($course) use ($categories, $instructors) {
 
