@@ -95,13 +95,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses/continue-watching', [CourseController::class, 'continueWatching']);
     
     Route::get('/courses', [CourseController::class, 'index']);
-    Route::get('/courses/{id}', [CourseController::class, 'show']);
+    // Route::get('/courses/{id}', [CourseController::class, 'show']);
     Route::post('/courses/{id}/progress', [CourseController::class, 'updateProgress']);
+    // ✅ الترتيب الصح
+Route::get('/courses/continue-watching', [CourseController::class, 'continueWatching']);
+Route::delete('/courses/{id}/history', [CourseController::class, 'removeFromHistory']);
+Route::get('/courses/{id}', [CourseController::class, 'show']); // ده يجي آخر
     
     // ───── Instructors ─────
     Route::get('/instructors/{id}/profile', [InstructorProfileController::class, 'show']);
     Route::get('/instructors', [InstructorController::class, 'index']);
     Route::get('/instructors/{id}/similar', [InstructorController::class, 'similar']);
+
+
     Route::post('/lessons/{id}/transcribe', function (Request $request, $id) {
         set_time_limit(300);
     $lesson = \App\Models\CourseLesson::findOrFail($id);

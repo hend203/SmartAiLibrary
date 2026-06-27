@@ -158,20 +158,48 @@ class CourseController extends Controller
     }
 
     // الكورسات اللي اليوزر بدأ يتفرج عليها
-    public function continueWatching(Request $request)
+  public function continueWatching(Request $request)
     {
         $user = $request->user();
 
-        $courses = Course::query()
-            ->join('course_progress', 'courses.id', '=', 'course_progress.course_id')
-            ->where('course_progress.user_id', $user->id)
-            ->where('course_progress.completed', false)
-            ->orderByDesc('course_progress.updated_at')
-            ->select('courses.*')
-            ->with('instructor')
-            ->limit(10)
+        $progress = CourseProgress::with(['course.instructor'])
+            ->where('user_id', $user->id)
+            ->where('completed', false)
+            ->orderByDesc('updated_at')
+            ->limit(15)
             ->get();
 
-        return response()->json(['data' => CourseResource::collection($courses)]);
+        $courses = $progress->map(function ($item) {
+            $course = $item->course;
+            return [
+                'id'                => $course->id,
+                'title'             => $course->title,
+                'thumbnail'         => $course->thumbnail,
+                'instructor_name'   => $course->instructor?->name ?? 'Unknown',
+                'progress'          => $item->progress_percentage ?? 0,   // لو عندك عمود progress_percentage
+                'last_position_seconds' => $item->last_position_seconds ?? 0,
+                'last_watched_at'   => $item->updated_at,
+            ];
+        });
+
+        return response()->json(['data' => $courses]);
+    }
+    public function removeFromHistory(Request $request, $courseId)
+    {
+        $user = $request->user();
+
+        $deleted = CourseProgress::where('user_id', $user->id)
+                    ->where('course_id', $courseId)
+                    ->delete();
+
+        if ($deleted) {
+            return response()->json([
+                'message' => 'Course removed from history successfully'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Course not found in history'
+        ], 404);
     }
 }

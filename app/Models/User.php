@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(PersonalShelf::class)->where('is_favorite', true);
     }
+    // في User model
+public function courseProgress()
+{
+    return $this->hasMany(CourseProgress::class);
+}
 }
