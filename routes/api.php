@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\AuthorProfileController;
 use App\Http\Controllers\Api\BookActionController;
+use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DiscoveryController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\HomeController;
@@ -13,11 +14,11 @@ use App\Http\Controllers\Api\NewPasswordController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\BookController;
-use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\CourseHomeController;
 use App\Http\Controllers\Api\CourseDiscoveryController;
 use App\Http\Controllers\Api\InstructorProfileController;
 use App\Http\Controllers\Api\InstructorController;
+use App\Http\Controllers\Api\AiController;
 
 
 // Authentication Routes (Public)
@@ -192,4 +193,45 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/books/{id}/history', [BookActionController::class, 'removeFromHistory']);
  Route::get('/books', [BookController::class, 'index']);
 
+    // Courses
+    // Route::get('/courses', [CourseController::class, 'index']);
+    // Route::get('/courses/featured', [CourseController::class, 'featured']);
+    // Route::get('/courses/free', [CourseController::class, 'free']);
+    // Route::get('/courses/category/{categoryId}', [CourseController::class, 'byCategory']);
+    // Route::get('/courses/{id}', [CourseController::class, 'show']);
+    // Route::post('/courses', [CourseController::class, 'store']);
+    // Route::put('/courses/{id}', [CourseController::class, 'update']);
+    // Route::delete('/courses/{id}', [CourseController::class, 'destroy']);
+
+    // // Course Videos
+    // Route::get('/courses/{courseId}/videos', [CourseController::class, 'videos']);
+    // Route::post('/courses/{courseId}/videos', [CourseController::class, 'addVideo']);
+    // Route::put('/courses/{courseId}/videos/{videoId}', [CourseController::class, 'updateVideo']);
+    // Route::delete('/courses/{courseId}/videos/{videoId}', [CourseController::class, 'deleteVideo']);
+
+    // ─── AI Services ────────────────────────────────────────────
+    // Route::prefix('ai')->group(function () {
+    //     // Health
+    //     Route::get('/health', [AiController::class, 'health']);
+
+    //     // Ingestion (رفع الكتب)
+    //     Route::post('/ingest', [AiController::class, 'ingest']);
+    //     Route::get('/ingest/{isbn}/status', [AiController::class, 'ingestStatus']);
+
+    //     // Recommendations (التوصيات)
+    //     Route::post('/recommendations', [AiController::class, 'recommendations']);
+    //     Route::get('/recommendations/cold-start', [AiController::class, 'coldStart']);
+
+    //     // Search (البحث الدلالي)
+    //     Route::post('/search/semantic', [AiController::class, 'search']);
+    //     Route::post('/search/similar/{isbn}', [AiController::class, 'similarBooks']);
+
+    //     // Summarise (التلخيص)
+    //     Route::post('/summarise', [AiController::class, 'summarise']);
+    //     Route::get('/summarise/{isbn}/progress', [AiController::class, 'summariseProgress']);
+
+    //     // RAG Q&A (الأسئلة التفاعلية)
+    //     Route::post('/qa/sync', [AiController::class, 'qaSync']);
+    //     Route::post('/qa/stream', [AiController::class, 'qaStream']);
+    // });
 });
